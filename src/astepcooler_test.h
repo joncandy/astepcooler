@@ -1,0 +1,8 @@
+#ifndef _ASTEPCOOLER_TEST_H_
+#define _ASTEPCOOLER_TEST_H_
+
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 1
+#define VERSION_PATCH 1
+
+#endif

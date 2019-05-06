@@ -1,0 +1,8 @@
+#ifndef _ASTEPCOOLER_TEST_H_
+#define _ASTEPCOOLER_TEST_H_
+
+#define VERSION_MAJOR @astepcooler_VERSION_MAJOR@
+#define VERSION_MINOR @astepcooler_VERSION_MINOR@
+#define VERSION_PATCH @astepcooler_VERSION_PATCH@
+
+#endif
