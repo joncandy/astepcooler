@@ -27,16 +27,19 @@
 extern "C" {
 #endif
 
+  /*!
+   * \brief A structure containing the Thermal Estimator model parameters
+   */
   typedef struct 
   {
-      float h;
-      uint32_t periodCounts;
-      float ambientTemp;
-      float initialState[ ASC_THERMAL_MODEL_NUM_STATES ];
-      float aveInputs[ ASC_THERMAL_MODEL_NUM_INPUTS ];
-      RK4SOLVER_CONFIGURATION * stateSpaceConfig;
-      RK4SOLVER_INPUT * solverInputs;
-      RK4SOLVER_OUTPUT * solverOutputs;
+      float h; //!< time step
+      uint32_t periodCounts; //!< number of time steps in the thermal period
+      float ambientTemp; //!< The ambient temperature
+      float initialState[ ASC_THERMAL_MODEL_NUM_STATES ]; //!< The initial temperatures for the thermal period
+      float aveInputs[ ASC_THERMAL_MODEL_NUM_INPUTS ]; //!< The heat source inputs from the period
+      RK4SOLVER_CONFIGURATION * stateSpaceConfig; //!< The state space thermal model
+      RK4SOLVER_INPUT * solverInputs; //!< Collection of thermal inputs for the RK4 Solver
+      RK4SOLVER_OUTPUT * solverOutputs; //!< Collection of thermal outputs for the RK4 Solver
   } ASC_THERMAL_MODEL_ESTIMATOR;
   
   extern void ASC_THERMAL_MODEL_ESTIMATOR_PeriodicTask( ASC_THERMAL_MODEL_ESTIMATOR * obj );

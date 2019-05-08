@@ -31,15 +31,15 @@ static RK4SOLVER_INPUT _overloadPredictorInput;
 static RK4SOLVER_OUTPUT _overloadPredictorOutput;
 static ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR _overloadPredictor = 
 {
-  1.0f,
-  (uint32_t)(60.0f/1.0f),
-  (uint32_t)(10.0f/1.0f),
-  20.0f,
-  { 0.0f, 0.0f, 0.0f, 0.0f },
-  { 80.0f-20.0f, 60.0f-20.0f, 60.0f-20.0f, 80.0f-20.0f },
-  { 0.0f, 0.0f, 0.0f },
-  { 5.4168f, 23.0400f, 5.5027f },
-  { 5.4168f, 16.0000f, 4.4368f },
+  1.0f, // sample time
+  (uint32_t)(60.0f/1.0f), // thermal period 
+  (uint32_t)(10.0f/1.0f), // overload period
+  20.0f, // ambient
+  { 0.0f, 0.0f, 0.0f, 0.0f }, // maximum observed temps
+  { 80.0f-20.0f, 60.0f-20.0f, 60.0f-20.0f, 80.0f-20.0f }, // temperature thresholds (relative to ambient)
+  { 0.0f, 0.0f, 0.0f }, // Initial State at start of thermal period t=0
+  { 5.4168f, 23.0400f, 5.5027f }, // Overload Maximum Thermal Inputs
+  { 5.4168f, 16.0000f, 4.4368f }, // Rated Maximum Thermal Inputs
   (void*)0,
   (void*)0,
   (void*)0
@@ -52,11 +52,11 @@ static RK4SOLVER_INPUT _estimatorInput;
 static RK4SOLVER_OUTPUT _estimatorOutput;
 static ASC_THERMAL_MODEL_ESTIMATOR _estimator = 
 {
-  0.1f,
-  (uint32_t)(1.0f/0.1f),
-  20.0f,
-  { 0.0f, 0.0f, 0.0f },
-  { 0.0f, 0.0f, 0.0f },
+  0.1f, // sample time
+  (uint32_t)(1.0f/0.1f), // thermal period
+  20.0f, // ambient
+  { 0.0f, 0.0f, 0.0f }, // Initial state at start of thermal period t=0
+  { 0.0f, 0.0f, 0.0f }, // Actual Thermal Inputs from the thermal period
   (void*)0,
   (void*)0,
   (void*)0
@@ -65,7 +65,11 @@ static ASC_THERMAL_MODEL_ESTIMATOR _estimator =
 static bool _setupEstimator( ASC_THERMAL_MODEL_ESTIMATOR * obj, RK4SOLVER_INPUT * rk4Input, RK4SOLVER_OUTPUT * rk4Output );
 static bool _cleanupEstimator( ASC_THERMAL_MODEL_ESTIMATOR * obj );
 
-extern bool ASC_THERMAL_MODEL_Setup( void )
+/*!
+ * \brief Setup and allocation of the overload predictor and estimator
+ * \return success
+ */
+bool ASC_THERMAL_MODEL_Setup( void )
 {
   bool status = true;
   
@@ -75,7 +79,11 @@ extern bool ASC_THERMAL_MODEL_Setup( void )
   return status;
 }
 
-extern bool ASC_THERMAL_MODEL_Cleanup( void )
+/*!
+ * \brief Cleanup and deallocation of the overload predictor and estimator
+ * \return success
+ */
+bool ASC_THERMAL_MODEL_Cleanup( void )
 {
   bool status = true;
   
@@ -85,11 +93,18 @@ extern bool ASC_THERMAL_MODEL_Cleanup( void )
   return status;
 }
 
+/*!
+ * \brief A background task that runs the Overload Predictor.
+ */
 void ASC_THERMAL_MODEL_BackgroundTask( void )
 {
   ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_BackgroundTask( &_overloadPredictor );
 }
 
+/*!
+ * \brief A periodic task that calculates the current temperature based on the
+ * previous period
+ */
 void ASC_THERMAL_MODEL_PeriodicTask( void )
 {
   ASC_THERMAL_MODEL_ESTIMATOR_PeriodicTask( &_estimator );
@@ -97,11 +112,22 @@ void ASC_THERMAL_MODEL_PeriodicTask( void )
   _updateOverloadPredictor( &_overloadPredictor, _estimator.ambientTemp, _estimator.solverOutputs->nextState );
 }
 
+/*!
+ * \brief Determines if overload capacity is available for the next thermal period
+ * \return Overload Capacity Availability
+ * \retval true Overload capacity available
+ * \retval false Overload Capacity is not available
+ */
 bool ASC_THERMAL_MODEL_IsOverloadAvailable( void )
 {
   return ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_IsOverloadAvailable( &_overloadPredictor );
 }
 
+/*! 
+ * \brief Gets the current estimated termperatures of the system
+ * \param temperatures [out] Array of system temperatures
+ * \return Number of temperatures in output parameter
+ */
 uint32_t ASC_THERMAL_MODEL_GetCurrentTemp( float * temperatures )
 {
   memcpy( (char*)temperatures, 
@@ -110,15 +136,24 @@ uint32_t ASC_THERMAL_MODEL_GetCurrentTemp( float * temperatures )
   return ASC_THERMAL_MODEL_NUM_OUTPUTS;
 }
 
+/*!
+ * \brief Gets the overload maximum system temperatures for the next thermal 
+ * period
+ * \param temperatures [out] Array of system temperatures
+ * \return Number of temperature sin output parameter
+ */
 uint32_t ASC_THERMAL_MODEL_GetOLTemp( float * temperatures )
 {
-  
   memcpy( (char*)temperatures, 
           (char*)_overloadPredictor.maxTemps, 
           ASC_THERMAL_MODEL_NUM_OUTPUTS * sizeof( float ) );
   return ASC_THERMAL_MODEL_NUM_OUTPUTS;
 }
 
+/*!
+ * \brief Sets the thermal source inputs used for the thermal estimator
+ * \param inputs Array of thermal heat source inputs for the previous period
+ */
 void ASC_THERMAL_MODEL_SetInputs( float * inputs )
 {
   ASC_THERMAL_MODEL_ESTIMATOR_SetInputs( &_estimator, inputs );

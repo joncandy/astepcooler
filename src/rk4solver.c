@@ -228,7 +228,7 @@ static void _GenerateOutput( RK4SOLVER_CONFIGURATION * config,
         K2 = fx( xn + h/2.*K1, 1/2.*(un+un+1) )
         K3 = fx( xn + h.*K2, un+1 )
  *  [y] = [C]*x + [B]*u
- * \returns success of failure and fill in output if successful
+ * \return success of failure and fill in output if successful
  * \retval 0U Failure
  * \retval 1U Success
  * \note All vectors must be of stated length and pointers are non-null
