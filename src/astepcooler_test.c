@@ -42,9 +42,13 @@ int main( int argc, char *argv[] )
   if ( RUN_THERMAL_MANAGER )
   {
     uint32_t itr = 0U;
-    float ins[ ASC_THERMAL_MODEL_NUM_INPUTS ] = { 4.6543, 12.9600, 3.9262 }; // 90% torque at 90% speed
+    float ins[ ASC_THERMAL_MODEL_NUM_INPUTS ];
     float temp[ ASC_THERMAL_MODEL_NUM_OUTPUTS ];
     ASC_THERMAL_MODEL_Setup();
+    
+    ASC_THERMAL_MODEL_CalculateSourceInputs( (float*)ins, 4.0f, 36.652 );
+    
+    printf( "inputs: [ %6.4f, %6.4f, %6.4f ]\n", ins[ 0U ], ins[ 1U ], ins[ 2U ] );
     
     for ( itr = 0U; itr <= 3600; itr++ )
     {

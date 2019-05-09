@@ -20,6 +20,7 @@
 #include "thermal_model.h"
 #include "thermal_model_estimator.h"
 #include "thermal_model_overload_predictor.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -157,6 +158,32 @@ uint32_t ASC_THERMAL_MODEL_GetOLTemp( float * temperatures )
 void ASC_THERMAL_MODEL_SetInputs( float * inputs )
 {
   ASC_THERMAL_MODEL_ESTIMATOR_SetInputs( &_estimator, inputs );
+}
+
+/*!
+ * \brief Calculates the thermal inputs based on drive current and rotational speed
+ * \param sourceInputs [out] The calculated thermal inputs in Watts
+ * \param driveCurrent The drive current applied to the system in Amps
+ * \param rotationalSpeed The rotational speed of the motor in rad/s
+ */
+void ASC_THERMAL_MODEL_CalculateSourceInputs( float * sourceInputs, float driveCurrent, float rotationalSpeed )
+{
+  if ( sourceInputs )
+  {
+    float phaseResistancex2 = 2.0f * 1.0f;
+    float rdsOnx4 = 4.0f * 1.325E-02f;
+    float busVoltagex4xtRiseFallxfSwitching = 4.0f * 48.0f * 2.0E+05f * (15E-09f + 19E-09f);;
+    float rsnsx2 = 2.0f * 2.0E-02f;
+    float oneOverSqrt2 = 0.70711f;
+    float driveCurrentRms = driveCurrent * oneOverSqrt2;
+    float driveCurrentRmsSquared = driveCurrent * driveCurrent / 2.0f;
+    
+    sourceInputs[ 0U ] = 3.03e-02f * powf( rotationalSpeed, 1.44f );
+    sourceInputs[ 1U ] = phaseResistancex2 * driveCurrentRmsSquared;
+    sourceInputs[ 2U ] = rdsOnx4 * driveCurrentRmsSquared +
+                         busVoltagex4xtRiseFallxfSwitching * driveCurrentRms +
+                         rsnsx2 * driveCurrentRmsSquared;
+  }
 }
 
 static bool _setupOverloadPredictor( ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR * obj, RK4SOLVER_INPUT * rk4Input, RK4SOLVER_OUTPUT * rk4Output )

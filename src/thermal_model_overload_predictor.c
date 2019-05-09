@@ -23,7 +23,23 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/* Some embedded compilers are not 100% C99 compliant and the built-in fmaxf is
+ * not in math.h. Also, including tgmath.h in this situation does not always
+ * fix the problem as it is dependent on complex.h. This is often the case if
+ * the embedded target does not have an fpu.
+ * So, just add the symbol declaration to catch the function if it is in the
+ * compiler's math library.
+ */
+#ifndef fmaxf
+extern float fmaxf( float, float );
+#endif
 
+/*!
+ * \brief Determines if overload is available by comparing predicted peak
+ * temperature based on 60s overload profile against the protective thermal 
+ * limits.
+ * \param obj Thermal Model Overload Predictor Object
+ */
 bool ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_IsOverloadAvailable( ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR * obj )
 {
   bool status = false;
@@ -49,6 +65,11 @@ bool ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_IsOverloadAvailable( ASC_THERMAL_MODEL
   return status;
 }
 
+/*!
+ * \brief A background task that calculates the temperature and captures peaks
+ * of the system based on 60s overload profile.
+ * \param obj Thermal Model Overload Predictor Object
+ */
 void ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_BackgroundTask( ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR * obj )
 {
   if ( obj )
@@ -92,6 +113,12 @@ void ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_BackgroundTask( ASC_THERMAL_MODEL_OVER
   }
 }
 
+/*!
+ * \brief Updates the ambient temperature used to offset the protective thermal
+ * limits.
+ * \param obj Thermal Model Overload Predictor Object
+ * \param ambient The current ambient temperature
+ */
 void ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR_UpdateAmbientTemperature( ASC_THERMAL_MODEL_OVERLOAD_PREDICTOR * obj, float ambient )
 {
   if ( obj )

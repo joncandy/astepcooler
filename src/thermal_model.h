@@ -34,6 +34,7 @@ extern "C" {
     extern uint32_t ASC_THERMAL_MODEL_GetCurrentTemp( float * temperatures );
     extern uint32_t ASC_THERMAL_MODEL_GetOLTemp( float * temperatures );
     extern void ASC_THERMAL_MODEL_SetInputs( float * inputs );
+    extern void ASC_THERMAL_MODEL_CalculateSourceInputs( float * sourceInputs, float driveCurrent, float rotationalSpeed );
     
 #ifdef __cplusplus
 }
