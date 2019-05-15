@@ -172,7 +172,7 @@ void ASC_THERMAL_MODEL_CalculateSourceInputs( float * sourceInputs, float driveC
   {
     float phaseResistancex2 = 2.0f * 1.0f;
     float rdsOnx4 = 4.0f * 1.325E-02f;
-    float busVoltagex4xtRiseFallxfSwitching = 4.0f * 48.0f * 2.0E+05f * (15E-09f + 19E-09f);;
+    float busVoltagex4xtRiseFallxfSwitching = 4.0f * 48.0f * 1.4E+05f * (15E-09f + 19E-09f);
     float rsnsx2 = 2.0f * 2.0E-02f;
     float oneOverSqrt2 = 0.70711f;
     float driveCurrentRms = driveCurrent * oneOverSqrt2;

@@ -254,7 +254,6 @@ uint8_t RK4SOLVER_Solve( RK4SOLVER_CONFIGURATION * config,
     _AddArray( input->currentInput, input->nextInput, u, config->numStates );
     _DotMultiplyArray( u, 0.5, u, config->numInputs );
     _fx( config, x, u, (float*)&K[ 1 ] );
-    _DotMultiplyArray( (float*)&K[ 1 ], 2.0, (float*)&K[ 1 ], config->numStates );
     
     // x = h/2 .* K[1] + currentState
     // u = 1/2 .* (currentInput + nextInput)
@@ -264,7 +263,7 @@ uint8_t RK4SOLVER_Solve( RK4SOLVER_CONFIGURATION * config,
     // _AddArray( input->currentInput, input->nextInput, u, config->numStates );
     // _DotMultiplyArray( u, 0.5, u, config->numInputs );
     _fx( config, x, u, (float*)&K[ 2 ] );
-    _DotMultiplyArray( (float*)&K[ 2 ], 2.0, (float*)&K[ 2 ], config->numStates );
+    
     
     // x = h .* K[2] + currentState
     // u = nextInput
@@ -272,6 +271,9 @@ uint8_t RK4SOLVER_Solve( RK4SOLVER_CONFIGURATION * config,
     _AddArray( input->currentState, x, x, config->numStates );
     _CopyArray( u, input->nextInput, config->numInputs );
     _fx( config, x, u, (float*)&K[ 3 ] );
+    
+    _DotMultiplyArray( (float*)&K[ 1 ], 2.0, (float*)&K[ 1 ], config->numStates );
+    _DotMultiplyArray( (float*)&K[ 2 ], 2.0, (float*)&K[ 2 ], config->numStates );
     
     // K[0] = K[total] = h/6 ( K[0] + 2.*K[1] + 2.*K[2] + K[3] )
     _AddArray4( (float*)&K[ 0 ],
