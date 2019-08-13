@@ -46,34 +46,35 @@ int main( int argc, char *argv[] )
     float temp[ ASC_THERMAL_MODEL_NUM_OUTPUTS ];
     ASC_THERMAL_MODEL_Setup();
     
-    ASC_THERMAL_MODEL_CalculateSourceInputs( (float*)ins, 4.0f, 36.652 );
+    ASC_THERMAL_MODEL_CalculateSourceInputs( (float*)ins, 4.0f, 0.0 );
     
     printf( "inputs: [ %6.4f, %6.4f, %6.4f ]\n", ins[ 0U ], ins[ 1U ], ins[ 2U ] );
     
-    for ( itr = 0U; itr <= 3600; itr++ )
+    for ( itr = 0U; itr <= 1800; itr++ )
     {
     
       ASC_THERMAL_MODEL_SetInputs( ins );
       ASC_THERMAL_MODEL_PeriodicTask();
-      ASC_THERMAL_MODEL_BackgroundTask();
+      //ASC_THERMAL_MODEL_BackgroundTask();
       
-      printf( "%4u ", itr );
+      //printf( "%4u ", itr );
       
       ASC_THERMAL_MODEL_GetCurrentTemp( (float*)temp );
-      printf( "%7.4f %7.4f %7.4f %7.4f | ", temp[ 0U ], temp[ 1U ], temp[ 2U ], temp[ 3U ] );
+      printf( "%7.4f %7.4f %7.4f %7.4f", temp[ 0U ], temp[ 1U ], temp[ 2U ], temp[ 3U ] );
       
       ASC_THERMAL_MODEL_GetOLTemp( (float*)temp );
-      printf( "%7.4f %7.4f %7.4f %7.4f | ", temp[ 0U ], temp[ 1U ], temp[ 2U ], temp[ 3U ] );
+      //printf( "%7.4f %7.4f %7.4f %7.4f | ", temp[ 0U ], temp[ 1U ], temp[ 2U ], temp[ 3U ] );
       
-      printf( "OL Allowed: " );
+      //printf( "OL Allowed: " );
       if ( ASC_THERMAL_MODEL_IsOverloadAvailable() )
       {
-        printf( "yes\n" );
+      //  printf( "yes\n" );
       }
       else
       {
-        printf( "no\n" );
+       // printf( "no\n" );
       }
+      printf( "\n" );
     }
     
     ASC_THERMAL_MODEL_Cleanup();

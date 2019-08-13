@@ -31,7 +31,7 @@
  * compiler's math library.
  */
 #ifndef fmaxf
-extern float fmaxf( float, float );
+#define fmaxf( a, b ) (((float)a > (float)b) ? (float)a : (float)b );
 #endif
 
 /*!

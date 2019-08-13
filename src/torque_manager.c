@@ -17,9 +17,21 @@
  */
 
 #include "torque_manager.h"
+#include "int_pi_controller.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+
+static INT_8_PI_CONTROLLER_t _pi_controller = {
+  10,  // Kp=10
+  1,
+  1,   // Ki = 0.1
+  10,
+  0,   // iSum
+  64U, // iSumMax
+  0U,  // iSumMin
+  1U, // reset iSum on first run
+};
 
 /*!
  * \brief Applies and upper, saturating limit
@@ -127,4 +139,17 @@ void ASC_TORQUE_MANAGER_ForegroundTask( ASC_TORQUE_MANAGER * obj )
       obj->lastFeedforwardValue = obj->activeFeedforwardValue;
     }
   }
+}
+
+int32_t ASC_TORQUE_MANAGER_DynamicTorqueCalculation( ASC_TORQUE_MANAGER * obj, uint8_t feedback )
+{
+  int32_t output = 0;
+  
+  if( obj )
+  {
+    uint8_t setpoint = 50U;
+    output = PI_Step( &obj->piController, setpoint, feedback, 0U );
+  }
+  
+  return output;
 }

@@ -19,6 +19,7 @@
 #ifndef _ASC_TORQUE_MANAGER_H
 #define _ASC_TORQUE_MANAGER_H
 
+#include "int_pi_controller.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -45,12 +46,14 @@ extern "C" {
         uint8_t lastFeedforwardValue;
         void (*setTorque)(uint8_t value);
         uint8_t setpoints[ ASC_TORQUE_SETPOINT_COUNT ];
+        INT_8_PI_CONTROLLER_t piController;
     } ASC_TORQUE_MANAGER;
     
     extern uint8_t ASC_TORQUE_MANAGER_SetTorqueByIndex( ASC_TORQUE_MANAGER * obj, uint8_t index );
     extern uint8_t ASC_TORQUE_MANAGER_SetSetpointLimit( ASC_TORQUE_MANAGER * obj, uint8_t limit );
     extern uint8_t ASC_TORQUE_MANAGER_SetFeedforwardValue( ASC_TORQUE_MANAGER * obj, uint8_t feedforward );
     extern void ASC_TORQUE_MANAGER_ForegroundTask( ASC_TORQUE_MANAGER * obj );
+    extern int32_t ASC_TORQUE_MANAGER_DynamicTorqueCalculation( ASC_TORQUE_MANAGER * obj, uint8_t feedback );
     
 #ifdef __cplusplus
 }

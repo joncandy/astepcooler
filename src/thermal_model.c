@@ -177,12 +177,14 @@ void ASC_THERMAL_MODEL_CalculateSourceInputs( float * sourceInputs, float driveC
     float oneOverSqrt2 = 0.70711f;
     float driveCurrentRms = driveCurrent * oneOverSqrt2;
     float driveCurrentRmsSquared = driveCurrent * driveCurrent / 2.0f;
+    float measuredOtherPowerComonents = 0.27f;
     
     sourceInputs[ 0U ] = 3.03e-02f * powf( rotationalSpeed, 1.44f );
     sourceInputs[ 1U ] = phaseResistancex2 * driveCurrentRmsSquared;
     sourceInputs[ 2U ] = rdsOnx4 * driveCurrentRmsSquared +
                          busVoltagex4xtRiseFallxfSwitching * driveCurrentRms +
-                         rsnsx2 * driveCurrentRmsSquared;
+                         rsnsx2 * driveCurrentRmsSquared + 
+                         measuredOtherPowerComonents;
   }
 }
 
